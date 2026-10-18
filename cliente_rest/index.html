@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf8">
+    <title>Gestor
+    </title>
+    <style>
+        .seccion{display: none;}
+        .activa{display: block;} 
+
+        table { border-collapse: collapse; margin-top: 8px; }
+        th, td { padding: 6px; }
+
+        /*subrayado de recursos en la tabla de reservas
+        */
+        .reserva-finalizada { background: white; }
+        .reserva-en-uso-ok { background: #b9d7ff; }     /* azul */
+        .reserva-en-uso-tarde { background: #ffb3b3; }  /* rojo */
+        .reserva-pendiente { background: #b7f7b7; }     /* verde */
+
+        fieldset > div { margin: 6px 0; }
+        label { display:inline-block; width: 90px; }
+        input, select { min-width: 180px; }
+
+
+        body{
+          font-family: Arial, Helvetica, sans-serif;
+          background:#f4f6f9;
+          margin:0;
+          padding:20px;
+        }
+
+        h1{
+          text-align:center;
+          margin:0 0 20px 0;
+          color:#2c3e50;
+        }
+
+        h2, h3{
+          color:#34495e;
+          margin-top:18px;
+        }
+
+        .seccion{
+          background:white;
+          padding:18px;
+          border-radius:8px;
+          box-shadow:0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        /* inputs/select  */
+        input, select{
+          padding:6px 8px;
+          border:1px solid #ccc;
+          border-radius:4px;
+        }
+
+        input:focus, select:focus{
+          outline:none;
+          border-color:#3498db;
+        }
+
+        /* botones */
+        button{
+          padding:7px 12px;
+          border:none;
+          border-radius:5px;
+          background:#3498db;
+          color:white;
+          cursor:pointer;
+          font-weight:bold;
+          margin:6px 6px 6px 0;
+        }
+
+        button:hover{
+          background:#2980b9;
+        }
+
+        table{
+          
+          width:100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+          background:white;
+        }
+
+        th{
+          background:#3498db;
+          color:white;
+          text-align:left;
+          padding:8px;
+        }
+
+        td{
+          padding:6px;
+          border-bottom:1px solid #ddd;
+        }
+
+        /* aplicamos hover a tabla de recursos
+          */
+        #tablaRecursos tr:hover{
+          background:#e8f4fd;
+        }
+
+
+        /* fieldset */
+        fieldset{
+          border:1px solid #ddd;
+          border-radius:6px;
+          padding:12px;
+          background:#fafafa;
+        }
+
+        legend{
+          font-weight:bold;
+          color:#2c3e50;
+        }
+
+       .cabeceraInicio{
+          display:flex;
+          align-items:center;
+          gap:10px;  
+        }
+       
+    </style>
+    
+</head>
+
+
+<body>
+
+    <h1>Aplicación Gestor</h1>
+
+    <!--=======================================
+    PANTALLA-- LOGIN (A)
+    ========================================*/--> 
+    <div id="login" class="seccion activa">
+        <h2>Acesso</h2>
+       <div>Usuario: <input id="usuarioLogin" /></div> 
+       <div>Contraseña: <input id="passwordLogin" type="password"/></div>
+       <button onclick="entrar()">Entrar</button> 
+       <button onclick="registro()">Registro</button>
+    </div>
+
+    <!--=======================================
+    PANTALLA-- REGISTRO/MODIFICACIÓN DE DATOS (B)
+    ========================================*/--> 
+    <div id="registroModificacion" class="seccion">
+        <h2>Datos gestor</h2>
+       <div>Nombre: <input id="nombreRegistro" /></div> 
+       <div>Apellidos: <input id="apellidosRegistro" /></div> 
+       <div>Login: <input id="usuarioRegistro" /></div> 
+       <div>Contraseña: <input id="passwordRegistro" type="password"/></div>
+       <button onclick="guardar()">Guardar</button> 
+       <button onclick="cancelar()">Cancelar</button> 
+    </div>
+
+    <!--=======================================
+    PANTALLA-- INICIO (C)
+    ========================================*/--> 
+    <div id="inicio" class="seccion">
+        <h2>Inicio</h2>
+        <div class="cabeceraInicio">
+          <p id="textoBienvenida"></p>
+          <button onclick="editarDatos()">Editar datos</button>
+        </div>
+        <h3>Búsqueda de recursos</h3>
+        
+        <div>
+        Categoría:
+        <select id="filtroCategoria" onchange="categoriaCambiada()"></select>
+        </div>
+
+        <div>
+        Modelo:
+        <select id="filtroModelo"></select>
+        </div>
+
+        <div>
+        Ubicación:
+        <select id="filtroUbicacion"></select>
+        </div>
+
+        <div>
+        Estado:
+        <select id="filtroEstado"></select>
+        </div>
+
+        <button onclick="buscar()">Buscar</button>
+
+        <h3>Recursos</h3>
+        <table border="1">
+        <thead>
+            <tr>
+            <th>N. Serie</th>
+            <th>Categoría</th>
+            <th>Modelo</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th>Abrir</th>
+            <th>X</th>
+            </tr>
+        </thead>
+        <tbody id="tablaRecursos">
+            <!-- empieza vacío-->
+        </tbody>
+        </table>
+
+        
+        <h3>Ranking de reservas por área médica</h3>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Posición</th>
+                    <th>Área médica</th>
+                    <th>Reservas totales</th>
+                </tr>
+            </thead>
+
+            <tbody id="tablaRanking"></tbody>
+        </table>
+
+
+        <h3>Avisos</h3>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Origen</th>
+              <th>Texto</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAvisos"></tbody>
+        </table>
+
+        <button onclick="anadirRecurso()">Añadir Recurso</button>
+        <button onclick="obtenerTodasReservas()">Enviar reservas al Ministerio</button>
+        <button onclick="salir()"> Salir </button>
+    </div>
+
+    <!--=======================================
+    PANTALLA-- RECURSO (D)
+    ========================================*/--> 
+
+ <div id="recurso" class="seccion">
+  <h2>Recurso</h2>
+  <button onclick="volverAlListado('inicio')">Volver al listado</button>
+  <button onclick="salir()">Salir</button>
+
+  <fieldset style="max-width:520px;">
+    <legend>Datos recurso</legend>
+
+    <div>
+      <label>Categoría:</label>
+      <select id="selectCategoriaRecurso" onchange="categoriaRecursoCambiada()"></select>
+   </div>
+
+
+    <div>
+      <label>Modelo:</label>
+      <select id="selectModeloRecurso"></select>
+    </div>
+
+    <div>
+      <label>Núm. serie:</label>
+      <input id="inputNumeroSerieRecurso" />
+    </div>
+
+    <div>
+      <label>Ubicación:</label>
+      <select id="selectUbicacionRecurso"></select>
+    </div>
+
+    <div>
+      <label>Estado:</label>
+      <select id="selectEstadoRecurso">
+        <option value="0">Operativo</option>
+        <option value="1">Baja/defectuoso</option>
+        <option value="2">Mantenimiento</option>
+      </select>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button onclick="guardarRecurso()">Guardar</button>
+    </div>
+  </fieldset>
+
+  <h3>Reservas</h3>
+  
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Sanitario</th>
+        <th>H. estim.</th>
+        <th>F. Petición</th>
+        <th>F. Inicio</th>
+        <th>F. Fin</th>
+      </tr>
+    </thead>
+    <tbody id="tablaReservasRecurso"></tbody>
+  </table>
+
+  <h3>Reseñas</h3>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Sanitario</th>
+        <th>Valoración</th>
+        <th>Comentario</th>
+      </tr>
+    </thead>
+    <tbody id="tablaResenyasRecurso"></tbody>
+  </table>
+</div>
+
+<script src="rest.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
