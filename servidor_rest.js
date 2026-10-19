@@ -9,11 +9,7 @@ const supabaseUrl = "https://mbmutjpvohzcggcpmuiv.supabase.co";
 const supabaseKey = "sb_publishable_lc8G9zTZUe9oyq7v1Y3Luw_A-x20o3E";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// La clave de firma del JWT es privada, se configura en Render como JWT_SECRET.
-var clave = process.env.JWT_SECRET;
-if (!clave) {
-    throw new Error("Falta configurar JWT_SECRET en las variables de entorno");
-}
+var clave = "miSecretoMasOscuro";
 
 app.use("/apiGestor", express.static("cliente_rest"));
 app.use(express.json());
